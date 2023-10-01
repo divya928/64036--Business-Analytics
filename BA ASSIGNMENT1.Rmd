@@ -1,0 +1,55 @@
+---
+title: "BA ASSIGNMENT1 DIVYA CHANDRASEKARAN 811284790"
+output: pdf_document
+date: "2023-10-01"
+---
+
+```{r}
+# Load ISLR library
+library(ISLR)
+```
+
+```{r}
+# Load the Carseats dataset
+data("Carseats")
+```
+
+```{r}
+# Print summary of the Carseats dataset
+summary(Carseats)
+#FROM THE ABOVE OUTPUT WE CAN SEE THAT THERE ARE 11 ROWS AND 400 OBSERVATIONS
+##THE NAMES OF THESE 11 ROWS ARE: SALES, COMPRICE, INCOME, ADVERTISING, POPULATION, PRICE,
+#SHELVELOC, AGE, EDUCATION, URBAN, US.
+```
+
+```{r}
+# Find the maximum value of the "advertising" attribute
+max_advertising <- max(Carseats$Advertising)
+max_advertising
+```
+
+```{r}
+# Calculate the IQR of the Price attribute
+iqr_price <- IQR(Carseats$Price)
+iqr_price
+```
+
+```{r}
+#Plot Sales against Price
+library(ggplot2) #FOR CREATING DATA VISUALIZATION
+boxplot(Carseats$Sales ~ Carseats$Price, xlab = "Price", ylab = "Sales", main = "BOX PLOT OF SALES AGAINST PRICE")
+```
+
+```{r}
+# Calculate the correlation coefficient
+correlation <- cor(Carseats$Price, Carseats$Sales)
+correlation
+#The correlation analysis will always result between -1 and 1. When the result is -1, 
+##the x value will increase and the y value will decrease; therefore, showing a negative significance. 
+##So, in the context of your Sales vs. Price plot and the negative correlation coefficient, 
+##it suggests that there is a negative linear relationship between the price of car seats,
+##and the sales of car seats in the data set. As the price increases, sales tend to decrease, 
+##and as the price decreases, sales tend to increase.
+```
+
+
