@@ -1,0 +1,166 @@
+---
+title: "BA ASSIGNMENT2"
+author: "DIVYA CHANDRASEKARAN_811284790"
+date: "2023-10-14"
+output:
+  word_document: default
+  pdf_document: default
+---
+
+```{r}
+#load the dataset
+library(readr)
+Online_Retail <- read_csv("Online_Retail.csv")
+View(Online_Retail)
+```
+```{r}
+#Creating summary for the dataset
+summary(Online_Retail)
+```
+
+```{r}
+#1. Transactions by country
+transaction.count <- table(Online_Retail$Country)
+total.transaction <- sum(transaction.count)
+transaction.percent <- (transaction.count/total.transaction) * 100
+
+#Show countries with more than 1 percent of total transaction
+country.summary <- data.frame(
+Country = names(transaction.count),
+TransactionCount = as.numeric(transaction.count),
+TransactionPercentage = as.numeric(transaction.percent))
+significant_countries <- subset(country.summary, transaction.percent > 1)
+#country.summary <- transaction.count[transaction.percent > 1, ]
+#names(country_trans) <- c("Transactions", "Percentage")
+print(country.summary)
+```
+
+
+```{r}
+# 2. Create TransactionValue variable 
+library(dplyr)
+Online_Retail <- Online_Retail %>%
+  mutate(TransactionValue = UnitPrice * Quantity)
+```
+
+```{r}
+# 3. Transaction value by country
+transaction.summary <- Online_Retail %>%
+  group_by(Country) %>%
+  summarise(total.transaction.value = sum(TransactionValue))
+transaction.summary
+```
+
+```{r}
+# 4. Optional question on date manipulation
+# Convert InvoiceDate to POSIXlt
+Temp <- strptime(Online_Retail$InvoiceDate, format='%m/%d/%Y %H:%M', tz='GMT') 
+head(Temp)
+```
+
+```{r}
+# Extract date, weekday, hour, and month
+Online_Retail$New_Invoice_Date <- as.Date(Temp)
+Online_Retail$Invoice_Day_Week <- weekdays(Online_Retail$New_Invoice_Date)  
+Online_Retail$New_Invoice_Hour <- as.numeric(format(Temp, "%H"))
+Online_Retail$New_Invoice_Month <- as.numeric(format(Temp, "%m"))
+```
+
+
+```{r}
+# a) Transactions by weekday (counts)
+wd_trans <- table(Online_Retail$Invoice_Day_Week)
+wd_trans_prop <- prop.table(wd_trans) * 100
+print(wd_trans_prop)
+
+```
+
+```{r}
+# b) Transactions by weekday (amounts)  
+wd_amounts <- tapply(Online_Retail$Quantity, Online_Retail$Invoice_Day_Week, sum)
+wd_amounts_prop <- prop.table(wd_amounts) * 100
+print(wd_amounts_prop)
+```
+
+```{r}
+# c) Transactions by month (amounts)
+month_amounts <- tapply(Online_Retail$Quantity, Online_Retail$New_Invoice_Month, sum)
+month_amounts_prop <- prop.table(month_amounts) * 100
+print(month_amounts_prop)
+```
+
+
+```{r}
+# d) Date with most transactions from Australia
+aus_trans <- Online_Retail[Online_Retail$Country == "Australia",]
+top_date <- aus_trans$New_Invoice_Date[which.max(table(aus_trans$New_Invoice_Date))]
+print(top_date)
+```
+
+```{r}
+# e) First, we'll filter to only include transaction hours between 7-20 when the IT team is available:
+
+Online_Retail <- Online_Retail[Online_Retail$New_Invoice_Hour >= 7 & 
+                              Online_Retail$New_Invoice_Hour < 20,]
+
+#Next we can get the transaction counts by hour:
+hour_counts <- table(Online_Retail$New_Invoice_Hour)
+
+#And find the 2 hour period with the minimum transactions:
+# Find index of lowest 2 hour count
+min_indx <- which.min(tapply(hour_counts, gl(length(hour_counts), 2), sum)) 
+
+# Start hour is the first hour of the 2 hour window
+start_hour <- min_indx + 7
+print(start_hour)
+
+#The two hour period starting at r start_hour would minimize the impact to customers, since it has the lowest transaction volume based on the data. This would be the best time for the planned maintenance.
+```
+
+```{r}
+# 5. Histogram of Germany transaction values
+hist(Online_Retail$TransactionValue[Online_Retail$Country=="Germany"], main="Germany Transactions", xlab="Transaction Value")
+```
+
+```{r}
+# 6. Top customers
+top_trans <- which.max(table(Online_Retail$CustomerID))
+top_spend <- which.max(tapply(Online_Retail$TransactionValue, Online_Retail$CustomerID, sum)) 
+print(c("Most Transactions:", top_trans, "Highest Spend:", top_spend))
+```
+
+```{r}
+# 7. Missing values percentage
+colMeans(is.na(Online_Retail))
+```
+
+```{r}
+# 8. Missing customer ID by country
+miss_cust <- tapply(is.na(Online_Retail$CustomerID), Online_Retail$Country, sum)
+print(miss_cust)
+```
+
+```{r}
+# 9. Average time between transactions 
+# Using diff() approximation
+mean(diff(Online_Retail$New_Invoice_Date[Online_Retail$CustomerID==15211]), na.rm=TRUE) 
+```
+
+```{r}
+# 10. Return rate for France
+fr_returns <- sum(Online_Retail$Quantity < 0 & Online_Retail$Country=="France")
+fr_trans <- sum(Online_Retail$Country=="France")
+print(fr_returns/fr_trans)
+```
+
+```{r}
+# 11. Top revenue product 
+top_revenue <- which.max(tapply(Online_Retail$TransactionValue, Online_Retail$StockCode, sum))
+print(top_revenue)
+```
+
+```{r}
+# 12. Number of unique customers
+length(unique(Online_Retail$CustomerID))
+```
+
