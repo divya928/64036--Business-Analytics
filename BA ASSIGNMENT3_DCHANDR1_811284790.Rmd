@@ -1,0 +1,205 @@
+---
+title: "BA ASSIGNMENT - REGRESSION ANALYSIS"
+author: "DIVYA CHANDRASEKARAN_811284790"
+date: "2023-11-05"
+output: word_document
+---
+
+```{r}
+#QUESTION1
+#RUNNING THE FOLLOWING CODE GIVEN IN THE QUESTION
+
+set.seed(2017)
+X=runif(100)*10
+Y=X*4+3.45
+Y=rnorm(100)*0.29*Y+Y
+```
+
+```{r}
+#PART A
+#PLOTTING Y AGAINST X
+
+plot(X,Y) 
+
+#THE PLOT DESCRIBES THAT WE CAN FIT THE LINEAR MODEL
+```
+
+```{r}
+cor(X,Y)
+
+#FROM THE ABOVE OUTPUT, WE CAN SAY THAT SINCE THE CORRELATION IS POSITIVEE, WE CAN FIT THE LINEAR MODEL. 
+```
+```{r}
+#PART B
+#CONSTRUCTING A SIMPLE LINEAR MODEL OF Y BASED ON X, AND WRITING THE EQUATION THAT EXPLAINS Y BASED ON X. 
+
+linearmodels<-lm(Y~X)
+summary(linearmodels)
+
+
+linearmodels$coefficients
+
+#ACCURACY OF THE MODEL
+#The linear model equation, Y = 3.6108X + 4.4655, has an accuracy of 65.17%. This means that approximately 65.17% of the variability in the variable Y can be explained by changes in the variable X as per the model. In other words, the linear model provides a reasonable fit to the data, and it accounts for 65.17% of the variation in Y based on changes in X.
+```
+
+```{r}
+#PART C
+#CALCULATEING THE COEFFICIENT OF DETERMINATION, AND OBSERVING HOW R2 OF THE MODEL IS RELATED TO THE CORRELATION COEFFICIENT OF X AND Y?
+
+#The square of correlation coefficient is same as coefficient of determination, 0.6517 
+#Coefficient of Determination = (Correlation Coefficient)^2
+
+coefficient_deter<-(cor(Y,X))^2
+coefficient_deter
+```
+
+```{r}
+#QUESTION 2
+#IN THIS QUESTION, WE WILL BE USING 'MTCARS' DATA
+
+#LOAD THE DATASET
+head(mtcars)
+
+```
+
+```{r}
+#PART A 
+#CONSTRUCTING SIMPLE LINEAR MODELS AND SEEING WHO IS RIGHT, JAMES OR CHRIS?
+
+linearmodels2<- lm(mtcars$hp~mtcars$wt,data = mtcars)
+
+#HERE, HP IS HORSE POWER AND WT IS WEIGHT
+
+summary(linearmodels2)
+
+```
+
+```{r}
+linearmodels3<- lm(mtcars$hp~mtcars$mpg,data = mtcars)
+summary(linearmodels3)
+
+#CHRIS IS ACCURATE, SINCE WHEN WE TAKE A LOOK AT THE MULTIPLE R-SQUARED VALUE, MPG HAS GOT HIGH R-SQUARE VALUE OF 0.6024 WHEN COMPARED TO THE WEIHT OF THE CAR WHICH IS 0.4339. 
+```
+
+```{r}
+#PART B
+#BUILDING A MODEL THAT USES THE NUMBER OF CYLINDERS AND MILES PER GALLON VALUES OF A CAR TO PREDICT THE HORSE POWER AND CALCULATING THE ESTIMATED HORSE POWER OF CAR WITH WITH FOUR CYLINDERS AND 22 MILES PER GALLON.
+
+linearmodels4<-lm(mtcars$hp~mtcars$mpg+mtcars$cyl,data = mtcars)
+summary(linearmodels4)
+
+linearmodels4$coefficients #just to get the intercept values (not really necessary)
+```
+
+```{r}
+#CHECKING THE ESTIMATED HORSE POWER OF A CAR WITH 4 CYCLINDER AND MILES PER GALLON OF 22
+
+predicted_models <- (linearmodels4$coefficients[1] +(linearmodels4$coefficients[2]*22) + (linearmodels4$coefficients[3]*4))
+predicted_models
+
+#THEREFORE, WE CAN CONCLUDE THAT THE ESTIMATED HORSE POWER OF A CAR WITH FOUR CYCLINDER AND MILES PER GALLON CONSISTING OF 22 US 88.93618
+
+```
+
+```{r}
+#QUESTION 3 - BOSTON HOUSING DATASET
+#INSTALLING THE PACKAGES
+
+#install.packages('mlbench')
+```
+
+```{R}
+#LOADING THE MLBENCH PACKAGE
+
+library(mlbench)
+data(BostonHousing)
+
+```
+
+```{r}
+#PART A
+#BUILDING A MODEL TO ESTIMATE THE MEDIAN VALUE OF OWNER-OCCUPIED HOMES, AND CHECKING IF THIS IS AN ACCURATE MODEL.
+
+housingmodels<-lm(BostonHousing$medv~BostonHousing$crim+BostonHousing$zn+BostonHousing$ptratio+BostonHousing$chas,data=BostonHousing)
+summary(housingmodels)
+
+#THE MODEL'S ACCURACY IS JUST 0.3599, THEREFORE, THIS IS NOT AN ACCURATE MODEL.
+```
+
+```{r}
+#PART B
+#BY USING THE ESTIMATED COEFFICEINTS, WE WILL CALCULATE WHICH HOUSE IS MORE EXPENSIVE AND BY HOW MUCH WITH RESPECT TO CHAS RIVER.
+housingmodels1<-lm(medv~chas,data = BostonHousing)
+summary(housingmodels1)
+
+housingmodels1$coefficients 
+
+```
+```{r}
+#For chas = 0 and #For chas = 1
+withoutchas <- ((housingmodels1$coefficients[2]*0)+ housingmodels1$coefficients[1])
+withoutchas
+
+withchas <- ((housingmodels1$coefficients[2]*1)+ housingmodels1$coefficients[1])
+withchas
+
+#FROM USING THE CORRELATION COFFICIENTS, THE HOUSE WITH CHAS IS MORE EXPENSIVE THAN THE ONE WITHOUT THE CHAS. THE TOTAL DIFFERENCE IS 6.34616
+```
+
+```{r}
+#PART B
+#QUESTION2
+#OBESERVING WHICH HOUSE IS MORE EXPENSVIE AND BY HOW MUCH WITH RESPECT TO PTRATIO
+
+housingmodels2<-lm(BostonHousing$medv~BostonHousing$ptratio,data = BostonHousing)
+housingmodels2
+
+#FROM UTILIZING THE CORRELATION COEFFICIENTS, WE CAN SAY THAT THE COEFFICEINTS ARE NEGATIVE. THEREFORE, THE PTRATIO INCREASE AS THE HOUSING PRICES DECREASE.
+```
+
+```{r}
+
+ptratio15 <- ((housingmodels2$coefficients[2]*15)+ housingmodels2$coefficients[1])
+ptratio15
+```
+```{r}
+ptratio18 <- ((housingmodels2$coefficients[2]*18)+ housingmodels2$coefficients[1])
+ptratio18
+
+#FROM THE OUTPUT, WE CAN SAY THAT THE PRICES OF THE HOUSE WHICH HAS A PTRATIO15 OF HIGH COMPARED FROM THE PRICE OF THE HOUSE OF PTRATIO18 BY DIFFERENCE OF 6.47153
+
+#The question asks to compare two hypothetical houses that are identical except one has a pupil-teacher ratio of 15 and the other has a ratio of 18. Based on the linear regression model coefficients, we know that the estimated coefficient for ptratio is -0.95.
+#This means that for a 1 unit increase in ptratio, the predicted median house value (medv) decreases by 0.95 units on average, holding all other variables constant. Since the house with ptratio=15 has a 3 unit lower ptratio than the house with ptratio=18, the predicted medv for the ptratio=15 house would be higher by:
+
+#3 * -0.95 = -2.85
+
+#So the house with ptratio=15 would be predicted to have a medv that is $2.85 higher than the house with ptratio=18, on average, assuming all other variables are equal.
+#In summary, the house with the lower pupil-teacher ratio of 15 is expected to have a $2.85 higher median value than the identical house with a pupil-teacher ratio of 18.
+
+```
+
+```{r}
+#PART C
+#SEEING WHICH OF THE VARIABLES ARE STATISTICALLY IMPORTANT WHEN RELATED TO THE HOUSE PRICES
+
+summary(housingmodels)
+
+#HERE, WE CAN SAY THAT THE OUTPUT HAS A LOW P-VALUE WHICH IS LESS THAT 0.05. THEREFORE, WE CAN REJECT THE NULL HYPOTHESIS BY LOOKING AT THE P-VALUES. MOREOVER, WE CAN SAY THAT THE NONE OF THE INDEPENDENT VARIABLES ARE STATISTICALLY SIGNIFICANNT.
+```
+
+```{r}
+#PART D
+#USING THE ANOVA ANALYSIS AND DETERMINING THE ORDER OF IMPORTANCE FOR THESE FOUR VARAIABLES.
+
+anova(housingmodels)
+```
+
+```{r}
+##FROM COMPARING THE P-VALUES, LISTED BELOW IS THE ORDER FROM HIGH TO LOW,
+#1) crim = 6440.8
+#2) ptratio = 4709.5
+#3) zn = 3554.3
+#4) chas = 667.
+```
+
